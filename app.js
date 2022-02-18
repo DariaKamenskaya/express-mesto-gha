@@ -1,13 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { routes } = require('./routes');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.get('/', (req,res) => {
-  res.send('Hello !')
-});
+
 
 async function main() {
   // подключаемся к серверу mongo
@@ -17,6 +16,8 @@ async function main() {
   });
 
   console.log(`Connect to db`);
+
+  app.use(routes);
 
   await app.listen(PORT);
 
