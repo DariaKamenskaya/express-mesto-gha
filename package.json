@@ -4,7 +4,8 @@
   "description": "[![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)\r # Проект Mesto фронтенд + бэкенд",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "lint": "npx eslint"
   },
   "repository": {
@@ -23,6 +24,8 @@
   },
   "dependencies": {
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.4"
+    "eslint-plugin-import": "^2.25.4",
+    "express": "^4.17.3",
+    "nodemon": "^2.0.15"
   }
 }
