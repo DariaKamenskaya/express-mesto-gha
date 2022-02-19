@@ -17,14 +17,14 @@ async function main() {
 
   console.log(`Connect to db`);
 
-  app.use(routes);
-
   app.use((req, res, next) => {
     req.user = {
       _id: '6210120257b5de18aa5c916a'
     };
     next();
   });
+
+  app.use(routes);
 
   await app.listen(PORT);
 

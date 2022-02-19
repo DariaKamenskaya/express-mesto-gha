@@ -8,9 +8,9 @@ exports.getUsers = async (req,res) => {
 
 exports.getUserbyId = async (req,res) => {
   try {
-    const user = await user.findById(req.params.userId);
-    if (user) {
-      res.status(200).send(user);
+    const userSpec = await user.findById(req.params.userId);
+    if (userSpec) {
+      res.status(200).send({data: userSpec});
     } else {
       res.status(404).send({message: 'Пользователь не найден'});
     }
