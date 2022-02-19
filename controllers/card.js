@@ -5,13 +5,14 @@ exports.getCards = async (req,res) => {
   res.status(200).send(cards);
 }
 
-exports.getCardById = async (req,res) => {
+exports.deleteCardById = async (req,res) => {
+  console.log(req.params.cardId);
   try {
-    const card = await card.findById(req.params.cardId);
+    const cardSpec = await card.findByIdAndRemove(req.params.cardId);
     if (card) {
-      res.status(200).send(card);
+      res.status(200).send(cardSpec);
     } else {
-      res.status(404).send({message: 'Пользователь не найден'});
+      res.status(404).send({message: 'Карточка не найдена'});
     }
   }
   catch(err) {
@@ -20,11 +21,12 @@ exports.getCardById = async (req,res) => {
 }
 
 exports.createCard = async (req,res) => {
+  console.log(req.user._id, req.body)
   try {
     const { name, link } = req.body;
     const ownerId = req.user._id;
 
-    user.create({ name, link, owner: ownerId });
+    card.create({ name, link, owner: ownerId });
     res.status(201).send({ data: card });
   }
   catch(err) {
