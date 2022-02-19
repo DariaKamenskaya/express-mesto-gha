@@ -6,7 +6,6 @@ exports.getCards = async (req,res) => {
 }
 
 exports.deleteCardById = async (req,res) => {
-  console.log(req.params.cardId);
   try {
     const cardSpec = await card.findByIdAndRemove(req.params.cardId);
     if (card) {
@@ -21,7 +20,6 @@ exports.deleteCardById = async (req,res) => {
 }
 
 exports.createCard = async (req,res) => {
-  console.log(req.user._id, req.body)
   try {
     const { name, link } = req.body;
     const ownerId = req.user._id;

@@ -30,3 +30,35 @@ exports.createUser = async (req,res) => {
     res.status(500).send({message: 'Произошла ошибка!', ...err});
   }
 }
+
+exports.patchUserMe = async (req,res) => {
+  try {
+    const { name, about } = req.body;
+    const ownerId = req.user._id;
+    const userPatchMe = await user.findByIdAndUpdate(ownerId, {name, about} );
+    if (userPatchMe) {
+      res.status(200).send({data: userPatchMe});
+    } else {
+      res.status(404).send({message: 'Пользователь не найден'});
+    }
+  }
+  catch(err) {
+    res.status(500).send({message: 'Произошла ошибка!', ...err});
+  }
+}
+
+exports.patchUserAvatar = async (req,res) => {
+  try {
+    const { avatar } = req.body;
+    const ownerId = req.user._id;
+    const userPatchAvatar = await user.findByIdAndUpdate(ownerId, {avatar});
+    if (userPatchAvatar) {
+      res.status(200).send({data: userPatchAvatar});
+    } else {
+      res.status(404).send({message: 'Пользователь не найден'});
+    }
+  }
+  catch(err) {
+    res.status(500).send({message: 'Произошла ошибка!', ...err});
+  }
+}
