@@ -31,3 +31,35 @@ exports.createCard = async (req,res) => {
     res.status(500).send({message: 'Произошла ошибка!', ...err});
   }
 }
+
+exports.putCardlike = async (req,res) => {
+  try {
+    const ownerId = req.user._id;
+
+    const cardLike = await card.findByIdAndUpdate( req.params.cardId, { $addToSet: { likes: ownerId } }, { new: true } )
+    if (cardLike) {
+      res.status(201).send({ data: cardLike });
+    } else {
+      res.status(404).send({message: 'Пользователь не найден'});
+    }
+  }
+  catch(err) {
+    res.status(500).send({message: 'Произошла ошибка!', ...err});
+  }
+}
+
+exports.deleteCardLike = async (req,res) => {
+  try {
+    const ownerId = req.user._id;
+
+    const cardDislike = await card.findByIdAndUpdate( req.params.cardId, { $pull: { likes: ownerId } }, { new: true } )
+    if (cardDislike) {
+      res.status(201).send({ data: cardDislike });
+    } else {
+      res.status(404).send({message: 'Пользователь не найден'});
+    }
+  }
+  catch(err) {
+    res.status(500).send({message: 'Произошла ошибка!', ...err});
+  }
+}
