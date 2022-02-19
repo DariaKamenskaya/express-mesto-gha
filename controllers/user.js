@@ -39,7 +39,7 @@ exports.patchUserMe = async (req,res) => {
     if (userPatchMe) {
       res.status(200).send({data: userPatchMe});
     } else {
-      res.status(404).send({message: 'Пользователь не найден'});
+      res.status(400).send({message: 'Переданы некорректные данные'});
     }
   }
   catch(err) {
@@ -55,7 +55,7 @@ exports.patchUserAvatar = async (req,res) => {
     if (userPatchAvatar) {
       res.status(200).send({data: userPatchAvatar});
     } else {
-      res.status(404).send({message: 'Пользователь не найден'});
+      res.status(400).send({message: 'Переданы некорректные данные'});
     }
   }
   catch(err) {

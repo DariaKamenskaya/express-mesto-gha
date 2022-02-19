@@ -40,7 +40,7 @@ exports.putCardlike = async (req,res) => {
     if (cardLike) {
       res.status(201).send({ data: cardLike });
     } else {
-      res.status(404).send({message: 'Пользователь не найден'});
+      res.status(400).send({message: 'Переданы некорректные данные'});
     }
   }
   catch(err) {
@@ -56,7 +56,7 @@ exports.deleteCardLike = async (req,res) => {
     if (cardDislike) {
       res.status(201).send({ data: cardDislike });
     } else {
-      res.status(404).send({message: 'Пользователь не найден'});
+      res.status(400).send({message: 'Переданы некорректные данные'});
     }
   }
   catch(err) {
