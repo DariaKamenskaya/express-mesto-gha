@@ -19,6 +19,13 @@ async function main() {
 
   app.use(routes);
 
+  app.use((req, res, next) => {
+    req.user = {
+      _id: '6210120257b5de18aa5c916a'
+    };
+    next();
+  });
+
   await app.listen(PORT);
 
   console.log(`App listening on port ${PORT}`)
