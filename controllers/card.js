@@ -29,8 +29,12 @@ exports.createCard = async (req, res) => {
   try {
     const { name, link } = req.body;
     const ownerId = req.user._id;
-    card.create({ name, link, owner: ownerId });
-    res.status(201).send({ data: card });
+    if (!name || !link) {
+      res.status(400).send({ message: 'Поля "name" и "link" должны быть заполнены' });
+    } else {
+      await card.create({ name, link, owner: ownerId });
+      res.status(201).send({ data: card });
+    }
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });

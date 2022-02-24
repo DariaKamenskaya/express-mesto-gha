@@ -1,10 +1,17 @@
 const express = require('express');
-const {getUsers, getUserbyId, createUser, patchUserMe, patchUserAvatar} = require('../controllers/user');
+const {
+  getUsers,
+  getUserbyId,
+  createUser,
+  patchUserMe,
+  patchUserAvatar,
+} = require('../controllers/user');
+
 const userRoutes = express.Router();
 
 userRoutes.get('/', getUsers);
 
-userRoutes.get('/:userId',  getUserbyId);
+userRoutes.get('/:userId', getUserbyId);
 
 userRoutes.patch('/me', express.json(), patchUserMe);
 
