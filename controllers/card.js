@@ -13,7 +13,7 @@ exports.deleteCardById = async (req, res) => {
   try {
     const cardSpec = await card.findByIdAndRemove(req.params.cardId);
     if (cardSpec) {
-      res.status(200).send(cardSpec);
+      res.status(205).send(cardSpec);
     } else {
       res.status(404).send({ message: 'Карточка не найдена' });
     }
@@ -52,7 +52,7 @@ exports.putCardlike = async (req, res) => {
       { new: true },
     );
     if (cardLike) {
-      res.status(201).send({ data: cardLike });
+      res.status(202).send({ data: cardLike });
     } else {
       res.status(404).send({ message: 'Переданы некорректные данные' });
     }
@@ -73,7 +73,7 @@ exports.deleteCardLike = async (req, res) => {
       { new: true },
     );
     if (cardDislike) {
-      res.status(201).send({ data: cardDislike });
+      res.status(205).send({ data: cardDislike });
     } else {
       res.status(404).send({ message: 'Переданы некорректные данные' });
     }
