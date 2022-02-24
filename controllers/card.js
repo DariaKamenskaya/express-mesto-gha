@@ -13,7 +13,7 @@ exports.deleteCardById = async (req, res) => {
   try {
     const cardSpec = await card.findByIdAndRemove(req.params.cardId);
     if (cardSpec) {
-      res.status(205).send(cardSpec);
+      res.status(200).send(cardSpec);
     } else {
       res.status(404).send({ message: 'Карточка не найдена' });
     }
@@ -32,8 +32,8 @@ exports.createCard = async (req, res) => {
     if (!name || !link) {
       res.status(400).send({ message: 'Поля "name" и "link" должны быть заполнены' });
     } else {
-      await card.create({ name, link, owner: ownerId });
-      res.status(201).send({ data: card });
+      const cardNew = await card.create({ name, link, owner: ownerId });
+      res.status(201).send({ data: cardNew });
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -52,7 +52,7 @@ exports.putCardlike = async (req, res) => {
       { new: true },
     );
     if (cardLike) {
-      res.status(202).send({ data: cardLike });
+      res.status(200).send({ data: cardLike });
     } else {
       res.status(404).send({ message: 'Переданы некорректные данные' });
     }
@@ -73,7 +73,7 @@ exports.deleteCardLike = async (req, res) => {
       { new: true },
     );
     if (cardDislike) {
-      res.status(205).send({ data: cardDislike });
+      res.status(200).send({ data: cardDislike });
     } else {
       res.status(404).send({ message: 'Переданы некорректные данные' });
     }

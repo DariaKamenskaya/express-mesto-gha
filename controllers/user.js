@@ -33,8 +33,8 @@ exports.createUser = async (req, res) => {
     if (!name || !about || !avatar) {
       res.status(400).send({ message: 'Поля "name", "about" и "avatar" должно быть заполнены' });
     } else {
-      await user.create({ name, about, avatar }, opts);
-      res.status(201).send({ data: user });
+      const userNew = await user.create({ name, about, avatar }, opts);
+      res.status(201).send({ data: userNew });
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
