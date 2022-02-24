@@ -5,7 +5,8 @@ const {
   deleteCardById,
   createCard,
   putCardlike,
-  deleteCardLike } = require('../controllers/card');
+  deleteCardLike,
+} = require('../controllers/card');
 
 const cardsRoutes = express.Router();
 

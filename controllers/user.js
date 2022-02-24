@@ -4,8 +4,7 @@ exports.getUsers = async (req, res) => {
   try {
     const users = await user.find({});
     res.status(200).send(users);
-  }
-  catch (err) {
+  } catch (err) {
     res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
@@ -18,8 +17,7 @@ exports.getUserbyId = async (req, res) => {
     } else {
       res.status(404).send({ message: 'Пользователь не найден' });
     }
-  }
-  catch (err) {
+  } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Невалидный id ' });
     }
@@ -32,8 +30,7 @@ exports.createUser = async (req, res) => {
     const { name, about, avatar } = req.body;
     user.create({ name, about, avatar });
     res.status(201).send({ data: user });
-  }
-  catch (err) {
+  } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
     }
@@ -56,8 +53,7 @@ exports.patchUserMe = async (req, res) => {
         res.status(404).send({ message: 'Переданы некорректные данные' });
       }
     }
-  }
-  catch (err) {
+  } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
     }
@@ -80,8 +76,7 @@ exports.patchUserAvatar = async (req, res) => {
         res.status(404).send({ message: 'Переданы некорректные данные' });
       }
     }
-  }
-  catch (err) {
+  } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
     }
