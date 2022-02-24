@@ -12,7 +12,7 @@ exports.getCards = async (req, res) => {
 exports.deleteCardById = async (req, res) => {
   try {
     const cardSpec = await card.findByIdAndRemove(req.params.cardId);
-    if (card) {
+    if (cardSpec) {
       res.status(200).send(cardSpec);
     } else {
       res.status(404).send({ message: 'Карточка не найдена' });

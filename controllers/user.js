@@ -29,10 +29,11 @@ exports.getUserbyId = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
+    const opts = { runValidators: true };
     if (!name || !about || !avatar) {
       res.status(400).send({ message: 'Поля "name", "about" и "avatar" должно быть заполнены' });
     } else {
-      user.create({ name, about, avatar });
+      user.create({ name, about, avatar }, opts);
       res.status(201).send({ data: user });
     }
   } catch (err) {
