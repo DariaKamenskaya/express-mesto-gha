@@ -10,16 +10,17 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.getUserbyId = async (req, res) => {
+  const ownerId = req.user._id;
   try {
     const userSpec = await user.findById(req.params.userId);
     if (userSpec) {
       res.status(200).send({ data: userSpec });
     } else {
-      res.status(404).send({ message: 'Пользователь не найден' });
+      res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Невалидный id ' });
+      res.status(400).send({ message: `Невалидный id ${ownerId}` });
     }
     res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
@@ -28,8 +29,12 @@ exports.getUserbyId = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
-    user.create({ name, about, avatar });
-    res.status(201).send({ data: user });
+    if (!name || !about || !avatar) {
+      res.status(400).send({ message: 'Поля "name", "about" и "avatar" должно быть заполнены' });
+    } else {
+      user.create({ name, about, avatar });
+      res.status(201).send({ data: user });
+    }
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
