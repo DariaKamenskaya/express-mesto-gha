@@ -1,4 +1,4 @@
-const user = require("../models/user");
+const user = require('../models/user');
 
 exports.getUsers = async (req, res) => {
   try {
@@ -10,7 +10,7 @@ exports.getUsers = async (req, res) => {
 };
 
 exports.getUserbyId = async (req, res) => {
-  const ownerId = req.user._id;
+  const ownerId = req.params.userId;
   try {
     const userSpec = await user.findById(req.params.userId);
     if (userSpec) {
@@ -29,18 +29,18 @@ exports.getUserbyId = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
-    const opts = { runValidators: true };
     if (!name || !about || !avatar) {
       res.status(400).send({ message: 'Поля "name", "about" и "avatar" должно быть заполнены' });
     } else {
-      const userNew = await user.create({ name, about, avatar }, opts);
+      const userNew = await user.create({ name, about, avatar });
       res.status(200).send({ data: userNew });
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -62,8 +62,9 @@ exports.patchUserMe = async (req, res) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -85,7 +86,8 @@ exports.patchUserAvatar = async (req, res) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
