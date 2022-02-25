@@ -20,8 +20,9 @@ exports.deleteCardById = async (req, res) => {
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Невалидный id ' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -38,8 +39,9 @@ exports.createCard = async (req, res) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Некорректные данные' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -59,8 +61,9 @@ exports.putCardlike = async (req, res) => {
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Невалидный id ' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -80,7 +83,8 @@ exports.deleteCardLike = async (req, res) => {
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Невалидный id ' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
