@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
+const jwt = require('jsonwebtoken'); // импортируем модуль jsonwebtoken
 const user = require('../models/user');
 
 const saltPassword = 10;
@@ -110,4 +111,24 @@ exports.patchUserAvatar = async (req, res) => {
       res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
+};
+
+// контроллер аутентификации (проверка почты и пароля)
+exports.login = (req, res) => {
+  // получаем данные
+  const { email, password } = req.body;
+  // ищем пользователя в базе по email-y
+  return user.findUserByCredentials(email, password)
+    .then((existingUser) => {
+      // создадим токен
+      const token = jwt.sign({ _id: existingUser._id }, 'some-secret-key', { expiresIn: '7d' });
+
+      // вернём токен
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
 };
