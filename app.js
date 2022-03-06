@@ -1,6 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { routes } = require('./routes');
+const {
+  login,
+  createUser,
+} = require('./controllers/user');
+const auth = require('./middlewares/auth');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
@@ -13,8 +18,6 @@ async function main() {
     useUnifiedTopology: true,
   });
 
-  // console.log('Connect to db');
-
   app.use((req, res, next) => {
     req.user = {
       _id: '6210120257b5de18aa5c916a',
@@ -22,11 +25,17 @@ async function main() {
     next();
   });
 
+  // роуты, не требующие авторизации - регистрация и логин
+  app.post('/signup', express.json(), createUser);
+  app.post('/signin', express.json(), login);
+
+  // авторизация
+  app.use(auth);
+
+  // роуты, которым авторизация нужна
   app.use(routes);
 
   await app.listen(PORT);
-
-  // console.log(`App listening on port ${PORT}`);
 }
 
 main();
