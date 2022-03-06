@@ -122,13 +122,10 @@ exports.login = (req, res) => {
     .then((existingUser) => {
       // создадим токен
       const token = jwt.sign({ _id: existingUser._id }, 'some-secret-key', { expiresIn: '7d' });
-
       // вернём токен
       res.send({ token });
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: 'Неправильная почта или логин 3', error: err });
+      res.status(401).send({ message: 'Неправильная почта или логин 3', ...err });
     });
 };
