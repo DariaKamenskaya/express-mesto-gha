@@ -41,14 +41,14 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .then((user) => {
       if (!user) {
         // не нашёлся — отклоняем промис
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return Promise.reject(new Error('Неправильные почта или пароль 1'));
       }
       // нашёлся — сравниваем хеши
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
             // отклоняем промис
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(new Error('Неправильные почта или пароль 2'));
           }
           return user;
         });

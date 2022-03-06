@@ -129,6 +129,6 @@ exports.login = (req, res) => {
     .catch((err) => {
       res
         .status(401)
-        .send({ message: err.message });
+        .send({ message: 'Неправильная почта или логин 3', error: err });
     });
 };
