@@ -18,12 +18,12 @@ async function main() {
     useUnifiedTopology: true,
   });
 
-  app.use((req, res, next) => {
-    req.user = {
-      _id: '6210120257b5de18aa5c916a',
-    };
-    next();
-  });
+  // app.use((req, res, next) => {
+  //   req.user = {
+  //     _id: '6210120257b5de18aa5c916a',
+  //   };
+  //   next();
+  // });
 
   // роуты, не требующие авторизации - регистрация и логин
   app.post('/signup', express.json(), createUser);
