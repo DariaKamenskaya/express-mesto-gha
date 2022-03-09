@@ -1,11 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const { routes } = require('./routes');
 const {
   login,
   createUser,
 } = require('./controllers/user');
 const auth = require('./middlewares/auth');
+const {
+  signUpValidation,
+  signInValidation,
+} = require('./middlewares/validatons');
+
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
@@ -25,15 +31,20 @@ async function main() {
   //   next();
   // });
 
+  // app.use(express.json());
+
   // роуты, не требующие авторизации - регистрация и логин
-  app.post('/signup', express.json(), createUser);
-  app.post('/signin', express.json(), login);
+  app.post('/signup', express.json(), signUpValidation, createUser);
+  app.post('/signin', express.json(), signInValidation, login);
 
   // авторизация
   app.use(auth);
 
   // роуты, которым авторизация нужна
   app.use(routes);
+
+  // обработчик ошибок celebrate
+  app.use(errors());
 
   // централизованная обработка ошибок
   app.use((err, req, res, next) => {

@@ -8,16 +8,17 @@ const ExistingEmailError = require('../errors/existing-email-err');
 
 const saltPassword = 10;
 
-exports.getUsers = async (req, res) => {
+exports.getUsers = async (req, res, next) => {
   try {
     const users = await user.find({});
     res.status(200).send(users);
-  } catch (next) {
+  } catch (err) {
+    next(err);
     // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
-exports.getUserMe = async (req, res) => {
+exports.getUserMe = async (req, res, next) => {
   const ownerId = req.user;
   try {
     const userSpec = await user.findById(ownerId);
@@ -29,7 +30,7 @@ exports.getUserMe = async (req, res) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      next (new WrongDataError(`Невалидный id ${ownerId}`));
+      next(new WrongDataError(`Невалидный id ${ownerId}`));
       // res.status(400).send({ message: `Невалидный id ${ownerId}` });
     } else {
       next(err);
@@ -38,7 +39,7 @@ exports.getUserMe = async (req, res) => {
   }
 };
 
-exports.getUserbyId = async (req, res) => {
+exports.getUserbyId = async (req, res, next) => {
   const ownerId = req.params.userId;
   try {
     const userSpec = await user.findById(req.params.userId);
@@ -50,7 +51,7 @@ exports.getUserbyId = async (req, res) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      next (new WrongDataError(`Невалидный id ${ownerId}`));
+      next(new WrongDataError(`Невалидный id ${ownerId}`));
       // res.status(400).send({ message: `Невалидный id ${ownerId}` });
     } else {
       next(err);
@@ -60,7 +61,7 @@ exports.getUserbyId = async (req, res) => {
 };
 
 // создание пользователя
-exports.createUser = async (req, res) => {
+exports.createUser = async (req, res, next) => {
   // получаем данные
   const {
     name, about, avatar, email, password,
@@ -68,7 +69,7 @@ exports.createUser = async (req, res) => {
   // проверка что введен пароль и логин
   if (!email || !password) {
     // res.status(400).send({ message: 'Поля "email" и "login" должно быть заполнены' });
-    throw new WrongDataError('Поля "email" и "login" должно быть заполнены');
+    throw new WrongDataError('Поля "email" и "password" должно быть заполнены');
   }
   // хешируем пароль
   bcrypt.hash(password, saltPassword)
@@ -88,16 +89,18 @@ exports.createUser = async (req, res) => {
             throw new WrongDataError('Некорректные данные');
             // res.status(400).send({ message: 'Некорректные данные' });
           }
-          if (err.name === "MongoError" && err.code === 11000) {
+          if (err.name === 'MongoError' && err.code === 11000) {
             // ошибка: пользователь пытается зарегистрироваться по уже существующему в базе email
             throw new ExistingEmailError('Данный email уже существует в базе данных');
           }
         });
     })
-    .catch((next) => {});
+    .catch((err) => {
+      next(err);
+    });
 };
 
-exports.patchUserMe = async (req, res) => {
+exports.patchUserMe = async (req, res, next) => {
   try {
     const { name, about } = req.body;
     const opts = { new: true, runValidators: true };
@@ -125,7 +128,7 @@ exports.patchUserMe = async (req, res) => {
   }
 };
 
-exports.patchUserAvatar = async (req, res) => {
+exports.patchUserAvatar = async (req, res, next) => {
   try {
     if (!req.body.avatar) {
       res.status(400).send({ message: 'Поле "avatar" должно быть заполнено' });
@@ -153,7 +156,7 @@ exports.patchUserAvatar = async (req, res) => {
 };
 
 // контроллер аутентификации (проверка почты и пароля)
-exports.login = (req, res) => {
+exports.login = (req, res, next) => {
   // получаем данные
   const { email, password } = req.body;
   // ищем пользователя в базе по email-y
@@ -165,7 +168,7 @@ exports.login = (req, res) => {
       res.send({ token });
     })
     .catch(() => {
-      next (new WrongTokenError('Ошибка авторизации: неправильная почта или логин'));
+      next(new WrongTokenError('Ошибка авторизации: неправильная почта или логин'));
       // res.status(401).send({ message: 'Неправильная почта или логин 3', ...err });
     });
 };

@@ -1,20 +1,19 @@
 const card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const WrongDataError = require('../errors/wrong-data-err');
-const WrongTokenError = require('../errors/wrong-token-err');
-const ExistingEmailError = require('../errors/existing-email-err');
 const DeleteCardError = require('../errors/delete-card-err');
 
-exports.getCards = async (req, res) => {
+exports.getCards = async (req, res, next) => {
   try {
     const cards = await card.find({});
     res.status(200).send(cards);
-  } catch (next) {
+  } catch (err) {
+    next(err);
     // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
-exports.deleteCardById = async (req, res) => {
+exports.deleteCardById = async (req, res, next) => {
   const ownerId = req.user._id; // идентификатор текущего пользователя
   const cardOwnerId = req.params.owner; // идентификатор владельца пользователя
   try {
@@ -32,7 +31,7 @@ exports.deleteCardById = async (req, res) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      next (new WrongDataError('Невалидный id '));
+      next(new WrongDataError('Невалидный id '));
       // res.status(400).send({ message: 'Невалидный id ' });
     } else {
       next(err);
@@ -41,7 +40,7 @@ exports.deleteCardById = async (req, res) => {
   }
 };
 
-exports.createCard = async (req, res) => {
+exports.createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const ownerId = req.user._id;
@@ -54,16 +53,16 @@ exports.createCard = async (req, res) => {
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
-      next (new WrongDataError('Некорректные данные'));
+      next(new WrongDataError('Некорректные данные'));
       // res.status(400).send({ message: 'Некорректные данные' });
     } else {
-      next (err);
+      next(err);
       // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
 
-exports.putCardlike = async (req, res) => {
+exports.putCardlike = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
     const cardLike = await card.findByIdAndUpdate(
@@ -79,16 +78,16 @@ exports.putCardlike = async (req, res) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      next (new WrongDataError('Невалидный id '));
+      next(new WrongDataError('Невалидный id '));
       // res.status(400).send({ message: 'Невалидный id ' });
     } else {
-      next (err);
+      next(err);
       // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
 
-exports.deleteCardLike = async (req, res) => {
+exports.deleteCardLike = async (req, res, next) => {
   try {
     const ownerId = req.user._id;
     const cardDislike = await card.findByIdAndUpdate(
@@ -104,10 +103,10 @@ exports.deleteCardLike = async (req, res) => {
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      next (new WrongDataError('Невалидный id '));
+      next(new WrongDataError('Невалидный id '));
       // res.status(400).send({ message: 'Невалидный id ' });
     } else {
-      next (err);
+      next(err);
       // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
