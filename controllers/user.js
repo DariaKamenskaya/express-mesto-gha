@@ -13,6 +13,23 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+exports.getUserMe = async (req, res) => {
+  const ownerId = req.user;
+  try {
+    const userSpec = await user.findById(ownerId);
+    if (userSpec) {
+      res.status(200).send({ data: userSpec });
+    } else {
+      res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
+    }
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: `Невалидный id ${ownerId}` });
+    }
+    res.status(500).send({ message: 'Произошла ошибка!', ...err });
+  }
+};
+
 exports.getUserbyId = async (req, res) => {
   const ownerId = req.params.userId;
   try {
