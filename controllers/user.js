@@ -1,6 +1,10 @@
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const jwt = require('jsonwebtoken'); // импортируем модуль jsonwebtoken
 const user = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+const WrongDataError = require('../errors/wrong-data-err');
+const WrongTokenError = require('../errors/wrong-token-err');
+const ExistingEmailError = require('../errors/existing-email-err');
 
 const saltPassword = 10;
 
@@ -8,8 +12,8 @@ exports.getUsers = async (req, res) => {
   try {
     const users = await user.find({});
     res.status(200).send(users);
-  } catch (err) {
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
+  } catch (next) {
+    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -20,13 +24,17 @@ exports.getUserMe = async (req, res) => {
     if (userSpec) {
       res.status(200).send({ data: userSpec });
     } else {
-      res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
+      throw new NotFoundError(`Пользователь по указанному ${ownerId} не найден`);
+      // res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: `Невалидный id ${ownerId}` });
+      next (new WrongDataError(`Невалидный id ${ownerId}`));
+      // res.status(400).send({ message: `Невалидный id ${ownerId}` });
+    } else {
+      next(err);
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
+    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -37,13 +45,17 @@ exports.getUserbyId = async (req, res) => {
     if (userSpec) {
       res.status(200).send({ data: userSpec });
     } else {
-      res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
+      throw new NotFoundError(`Пользователь по указанному ${ownerId} не найден`);
+      // res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: `Невалидный id ${ownerId}` });
+      next (new WrongDataError(`Невалидный id ${ownerId}`));
+      // res.status(400).send({ message: `Невалидный id ${ownerId}` });
+    } else {
+      next(err);
     }
-    res.status(500).send({ message: 'Произошла ошибка!', ...err });
+    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -55,8 +67,8 @@ exports.createUser = async (req, res) => {
   } = req.body;
   // проверка что введен пароль и логин
   if (!email || !password) {
-    res.status(400).send({ message: 'Поля "email" и "login" должно быть заполнены' });
-    return;
+    // res.status(400).send({ message: 'Поля "email" и "login" должно быть заполнены' });
+    throw new WrongDataError('Поля "email" и "login" должно быть заполнены');
   }
   // хешируем пароль
   bcrypt.hash(password, saltPassword)
@@ -73,13 +85,16 @@ exports.createUser = async (req, res) => {
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            res.status(400).send({ message: 'Некорректные данные' });
-          } else {
-            res.status(500).send({ message: 'Произошла ошибка!', ...err });
+            throw new WrongDataError('Некорректные данные');
+            // res.status(400).send({ message: 'Некорректные данные' });
+          }
+          if (err.name === "MongoError" && err.code === 11000) {
+            // ошибка: пользователь пытается зарегистрироваться по уже существующему в базе email
+            throw new ExistingEmailError('Данный email уже существует в базе данных');
           }
         });
     })
-    .catch(() => {});
+    .catch((next) => {});
 };
 
 exports.patchUserMe = async (req, res) => {
@@ -87,21 +102,25 @@ exports.patchUserMe = async (req, res) => {
     const { name, about } = req.body;
     const opts = { new: true, runValidators: true };
     if (!name || !about) {
-      res.status(400).send({ message: 'Поля "name" и "about" должно быть заполнены' });
+      throw new WrongDataError('Поля "name" и "about" должно быть заполнены');
+      // res.status(400).send({ message: 'Поля "name" и "about" должно быть заполнены' });
     } else {
       const ownerId = req.user._id;
       const userPatchMe = await user.findByIdAndUpdate(ownerId, { name, about }, opts);
       if (userPatchMe) {
         res.status(200).send({ data: userPatchMe });
       } else {
-        res.status(404).send({ message: 'Переданы некорректные данные' });
+        throw new NotFoundError('Переданы некорректные данные');
+        // res.status(404).send({ message: 'Переданы некорректные данные' });
       }
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Некорректные данные' });
+      next(new WrongDataError('Некорректные данные'));
+      // res.status(400).send({ message: 'Некорректные данные' });
     } else {
-      res.status(500).send({ message: 'Произошла ошибка!', ...err });
+      next(err);
+    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
@@ -118,14 +137,17 @@ exports.patchUserAvatar = async (req, res) => {
       if (userPatchAvatar) {
         res.status(200).send({ data: userPatchAvatar });
       } else {
-        res.status(404).send({ message: 'Переданы некорректные данные' });
+        throw new NotFoundError('Переданы некорректные данные');
+        // res.status(404).send({ message: 'Переданы некорректные данные' });
       }
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Некорректные данные' });
+      next(new WrongDataError('Некорректные данные'));
+      // res.status(400).send({ message: 'Некорректные данные' });
     } else {
-      res.status(500).send({ message: 'Произошла ошибка!', ...err });
+      next(err);
+    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
@@ -142,7 +164,8 @@ exports.login = (req, res) => {
       // вернём токен
       res.send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: 'Неправильная почта или логин 3', ...err });
+    .catch(() => {
+      next (new WrongTokenError('Ошибка авторизации: неправильная почта или логин'));
+      // res.status(401).send({ message: 'Неправильная почта или логин 3', ...err });
     });
 };
