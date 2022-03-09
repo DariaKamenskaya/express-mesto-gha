@@ -10,12 +10,18 @@ exports.getCards = async (req, res) => {
 };
 
 exports.deleteCardById = async (req, res) => {
+  const ownerId = req.user._id; // идентификатор текущего пользователя
+  const cardOwnerId = req.params.owner; // идентификатор текущего пользователя
   try {
-    const cardSpec = await card.findByIdAndRemove(req.params.cardId);
-    if (cardSpec) {
-      res.status(200).send(cardSpec);
+    if (ownerId === cardOwnerId) {
+      const cardSpec = await card.findByIdAndRemove(req.params.cardId);
+      if (cardSpec) {
+        res.status(200).send(cardSpec);
+      } else {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      }
     } else {
-      res.status(404).send({ message: 'Карточка не найдена' });
+      res.status(400).send({ message: 'Чужая карточка не может быть удалена' });
     }
   } catch (err) {
     if (err.name === 'CastError') {
