@@ -73,7 +73,7 @@ exports.createUser = async (req, res, next) => {
         email,
         password: hash, // записываем хеш в базу
       })
-        .then((userNew) => {
+        .then(() => {
           res.status(200).send({
             data: {
               name,
