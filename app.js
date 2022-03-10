@@ -24,15 +24,6 @@ async function main() {
     useUnifiedTopology: true,
   });
 
-  // app.use((req, res, next) => {
-  //   req.user = {
-  //     _id: '6210120257b5de18aa5c916a',
-  //   };
-  //   next();
-  // });
-
-  // app.use(express.json());
-
   // роуты, не требующие авторизации - регистрация и логин
   app.post('/signup', express.json(), signUpValidation, createUser);
   app.post('/signin', express.json(), signInValidation, login);
@@ -58,6 +49,7 @@ async function main() {
           ? 'На сервере произошла ошибка'
           : message,
       });
+    next();
   });
 
   await app.listen(PORT);
