@@ -94,7 +94,8 @@ exports.createUser = async (req, res, next) => {
             next(err);
           }
         });
-    });
+    })
+    .catch(next);
 };
 
 exports.patchUserMe = async (req, res, next) => {
