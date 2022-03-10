@@ -13,31 +13,18 @@ exports.getCards = async (req, res, next) => {
   }
 };
 
-exports.deleteCardById = async (req, res, next) => {
+exports.deleteCardById = (req, res, next) => {
   const ownerId = req.user._id; // идентификатор текущего пользователя
-  const cardOwnerId = req.params.owner; // идентификатор владельца пользователя
-  try {
-    if (ownerId === cardOwnerId) {
-      const cardSpec = await card.findByIdAndRemove(req.params.cardId);
-      if (cardSpec) {
-        res.status(200).send(cardSpec);
-      } else {
-        throw new NotFoundError('Карточка не найдена');
-        // res.status(404).send({ message: 'Карточка не найдена' });
+  card.findById(req.params.cardId)
+    .orFail(() => new NotFoundError('Нет карточки по заданному id'))
+    .then((userCard) => {
+      if (!userCard.owner.equals(ownerId)) {
+        return next(new DeleteCardError('Чужая карточка не может быть удалена'));
       }
-    } else {
-      throw new DeleteCardError('Чужая карточка не может быть удалена');
-      // res.status(409).send({ message: 'Чужая карточка не может быть удалена' });
-    }
-  } catch (err) {
-    if (err.name === 'CastError') {
-      next(new WrongDataError('Невалидный id '));
-      // res.status(400).send({ message: 'Невалидный id ' });
-    } else {
-      next(err);
-      // res.status(500).send({ message: 'Произошла ошибка!', ...err });
-    }
-  }
+      return userCard.remove()
+        .then(() => res.status(200).send(userCard));
+    })
+    .catch(next);
 };
 
 exports.createCard = async (req, res, next) => {
