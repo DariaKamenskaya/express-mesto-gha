@@ -9,6 +9,7 @@ const {
 const {
   patchUserMeValidation,
   patchUserAvatarValidation,
+  userIdValidation,
 } = require('../middlewares/validatons');
 
 const userRoutes = express.Router();
@@ -19,7 +20,7 @@ userRoutes.get('/me', getUserMe);
 
 userRoutes.patch('/me', patchUserMeValidation, express.json(), patchUserMe);
 
-userRoutes.get('/:userId', getUserbyId);
+userRoutes.get('/:userId', userIdValidation, getUserbyId);
 
 userRoutes.patch('/me/avatar', patchUserAvatarValidation, express.json(), patchUserAvatar);
 

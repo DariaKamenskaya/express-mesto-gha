@@ -9,7 +9,6 @@ exports.getCards = async (req, res, next) => {
     res.status(200).send(cards);
   } catch (err) {
     next(err);
-    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -33,7 +32,6 @@ exports.createCard = async (req, res, next) => {
     const ownerId = req.user._id;
     if (!name || !link) {
       throw new WrongDataError('Поля "name" и "link" должны быть заполнены');
-      // res.status(400).send({ message: 'Поля "name" и "link" должны быть заполнены' });
     } else {
       const cardNew = await card.create({ name, link, owner: ownerId });
       res.status(201).send({ data: cardNew });
@@ -41,10 +39,8 @@ exports.createCard = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new WrongDataError('Некорректные данные'));
-      // res.status(400).send({ message: 'Некорректные данные' });
     } else {
       next(err);
-      // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
@@ -61,15 +57,12 @@ exports.putCardlike = async (req, res, next) => {
       res.status(200).send({ data: cardLike });
     } else {
       throw new NotFoundError('Переданы некорректные данные');
-      // res.status(404).send({ message: 'Переданы некорректные данные' });
     }
   } catch (err) {
     if (err.name === 'CastError') {
       next(new WrongDataError('Невалидный id '));
-      // res.status(400).send({ message: 'Невалидный id ' });
     } else {
       next(err);
-      // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
@@ -86,15 +79,12 @@ exports.deleteCardLike = async (req, res, next) => {
       res.status(200).send({ data: cardDislike });
     } else {
       throw new NotFoundError('Переданы некорректные данные');
-      // res.status(404).send({ message: 'Переданы некорректные данные' });
     }
   } catch (err) {
     if (err.name === 'CastError') {
       next(new WrongDataError('Невалидный id '));
-      // res.status(400).send({ message: 'Невалидный id ' });
     } else {
       next(err);
-      // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
