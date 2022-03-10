@@ -14,28 +14,24 @@ exports.getUsers = async (req, res, next) => {
     res.status(200).send(users);
   } catch (err) {
     next(err);
-    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
 exports.getUserMe = async (req, res, next) => {
-  const ownerId = req.user;
+  const ownerId = req.user._id;
   try {
     const userSpec = await user.findById(ownerId);
     if (userSpec) {
       res.status(200).send({ data: userSpec });
     } else {
       throw new NotFoundError(`Пользователь по указанному ${ownerId} не найден`);
-      // res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
     }
   } catch (err) {
     if (err.name === 'CastError') {
       next(new WrongDataError(`Невалидный id ${ownerId}`));
-      // res.status(400).send({ message: `Невалидный id ${ownerId}` });
     } else {
       next(err);
     }
-    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -47,16 +43,13 @@ exports.getUserbyId = async (req, res, next) => {
       res.status(200).send({ data: userSpec });
     } else {
       throw new NotFoundError(`Пользователь по указанному ${ownerId} не найден`);
-      // res.status(404).send({ message: `Пользователь по указанному ${ownerId} не найден` });
     }
   } catch (err) {
     if (err.name === 'CastError') {
       next(new WrongDataError(`Невалидный id ${ownerId}`));
-      // res.status(400).send({ message: `Невалидный id ${ownerId}` });
     } else {
       next(err);
     }
-    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
   }
 };
 
@@ -68,8 +61,7 @@ exports.createUser = async (req, res, next) => {
   } = req.body;
   // проверка что введен пароль и логин
   if (!email || !password) {
-    // res.status(400).send({ message: 'Поля "email" и "login" должно быть заполнены' });
-    throw new WrongDataError('Поля "email" и "password" должно быть заполнены');
+    next(new WrongDataError('Поля "email" и "password" должно быть заполнены'));
   }
   // хешируем пароль
   bcrypt.hash(password, saltPassword)
@@ -82,21 +74,26 @@ exports.createUser = async (req, res, next) => {
         password: hash, // записываем хеш в базу
       })
         .then((userNew) => {
-          res.status(200).send({ data: userNew });
+          res.status(200).send({
+            data: {
+              name,
+              about,
+              avatar,
+              email,
+            },
+          });
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            throw new WrongDataError('Некорректные данные');
-            // res.status(400).send({ message: 'Некорректные данные' });
+            next(new WrongDataError('Некорректные данные'));
           }
-          if (err.name === 'MongoError' && err.code === 11000) {
+          if (err.code === 11000) {
             // ошибка: пользователь пытается зарегистрироваться по уже существующему в базе email
-            throw new ExistingEmailError('Данный email уже существует в базе данных');
+            next(new ExistingEmailError('Данный email уже существует в базе данных'));
+          } else {
+            next(err);
           }
         });
-    })
-    .catch((err) => {
-      next(err);
     });
 };
 
@@ -106,7 +103,6 @@ exports.patchUserMe = async (req, res, next) => {
     const opts = { new: true, runValidators: true };
     if (!name || !about) {
       throw new WrongDataError('Поля "name" и "about" должно быть заполнены');
-      // res.status(400).send({ message: 'Поля "name" и "about" должно быть заполнены' });
     } else {
       const ownerId = req.user._id;
       const userPatchMe = await user.findByIdAndUpdate(ownerId, { name, about }, opts);
@@ -114,16 +110,13 @@ exports.patchUserMe = async (req, res, next) => {
         res.status(200).send({ data: userPatchMe });
       } else {
         throw new NotFoundError('Переданы некорректные данные');
-        // res.status(404).send({ message: 'Переданы некорректные данные' });
       }
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new WrongDataError('Некорректные данные'));
-      // res.status(400).send({ message: 'Некорректные данные' });
     } else {
       next(err);
-    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
@@ -131,7 +124,7 @@ exports.patchUserMe = async (req, res, next) => {
 exports.patchUserAvatar = async (req, res, next) => {
   try {
     if (!req.body.avatar) {
-      res.status(400).send({ message: 'Поле "avatar" должно быть заполнено' });
+      throw new WrongDataError('Поле "avatar" должно быть заполнено');
     } else {
       const { avatar } = req.body;
       const ownerId = req.user._id;
@@ -141,16 +134,13 @@ exports.patchUserAvatar = async (req, res, next) => {
         res.status(200).send({ data: userPatchAvatar });
       } else {
         throw new NotFoundError('Переданы некорректные данные');
-        // res.status(404).send({ message: 'Переданы некорректные данные' });
       }
     }
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new WrongDataError('Некорректные данные'));
-      // res.status(400).send({ message: 'Некорректные данные' });
     } else {
       next(err);
-    // res.status(500).send({ message: 'Произошла ошибка!', ...err });
     }
   }
 };
@@ -169,6 +159,5 @@ exports.login = (req, res, next) => {
     })
     .catch(() => {
       next(new WrongTokenError('Ошибка авторизации: неправильная почта или логин'));
-      // res.status(401).send({ message: 'Неправильная почта или логин 3', ...err });
     });
 };
