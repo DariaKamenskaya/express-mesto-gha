@@ -26,7 +26,6 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "celebrate": "^15.0.1",
     "express": "^4.17.3",
